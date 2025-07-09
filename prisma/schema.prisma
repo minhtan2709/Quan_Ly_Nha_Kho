@@ -6,25 +6,195 @@
 // npx prisma migrate dev --name init
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum WarehouseLocationType {
+  KHO
+  KE
+  NGAN
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  username     String   @db.VarChar(20)
-  password     String   @db.VarChar(255)
-  email        String   @db.VarChar(20)
-  role         String
-  status       String   @default("active")
-  phone_number String   @db.VarChar(10)
-  salt         String   @db.VarChar(64)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt @default(now())
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  password  String
+  email     String    @unique
+  role      Role
+  status    String    @default("active")
+  phone_number String
+  salt      String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+  //createdBy Int?
+
+  // Relations
+  createdInboundReceipts    InboundReceipt[]   @relation("InboundCreatedBy")
+  createdOutboundReceipts   OutboundReceipt[]  @relation("OutboundCreatedBy")
+  createdStocktakings       Stocktaking[]      @relation("StocktakingCreatedBy")
+  logs                      TransactionLog[]
 
   @@map("user") 
 }
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  code        String    @unique
+  description String?
+  unit        String
+  barcode     String?
+  quantity    Int       @default(0)
+  locationId  Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  location           WarehouseLocation   @relation(fields: [locationId], references: [id])
+  inboundDetails     InboundDetail[]
+  outboundDetails    OutboundDetail[]
+  stocktakingDetails StocktakingDetail[]
+
+  @@map("product") 
+}
+
+model WarehouseLocation {
+  id          Int       @id @default(autoincrement())
+  name        String
+  code        String    @unique
+  description String?
+  type        WarehouseLocationType
+  parentId    Int?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  parent         WarehouseLocation? @relation("ParentLocation", fields: [parentId], references: [id])
+  children       WarehouseLocation[] @relation("ParentLocation")
+  products       Product[]
+  inboundDetails InboundDetail[]
+  outboundDetails OutboundDetail[]
+  stocktakingDetails StocktakingDetail[]
+
+  @@map("warehouselocation") 
+}
+
+model InboundReceipt {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  supplier  String
+  createdBy Int
+  createdAt DateTime @default(now())
+  status    String
+
+  // Relations
+  details   InboundDetail[]
+  user      User     @relation("InboundCreatedBy", fields: [createdBy], references: [id])
+
+  @@map("inboundreceipt") 
+}
+
+model InboundDetail {
+  id         Int      @id @default(autoincrement())
+  receiptId  Int
+  productId  Int
+  quantity   Int
+  unitPrice  Float
+  locationId Int
+
+  // Relations
+  receipt   InboundReceipt  @relation(fields: [receiptId], references: [id])
+  product   Product         @relation(fields: [productId], references: [id])
+  location  WarehouseLocation @relation(fields: [locationId], references: [id])
+
+  @@map("inbounddetail") 
+}
+
+model OutboundReceipt {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  customer  String
+  createdBy Int
+  createdAt DateTime @default(now())
+  status    String
+
+  // Relations
+  details   OutboundDetail[]
+  user      User     @relation("OutboundCreatedBy", fields: [createdBy], references: [id])
+
+  @@map("outboundreceipt") 
+}
+
+
+
+model OutboundDetail {
+  id         Int      @id @default(autoincrement())
+  receiptId  Int
+  productId  Int
+  quantity   Int
+  unitPrice  Float
+  locationId Int
+
+  // Relations
+  receipt   OutboundReceipt  @relation(fields: [receiptId], references: [id])
+  product   Product          @relation(fields: [productId], references: [id])
+  location  WarehouseLocation @relation(fields: [locationId], references: [id])
+
+  @@map("outbounddetail") 
+}
+
+model Stocktaking {
+  id        Int      @id @default(autoincrement())
+  createdBy Int
+  createdAt DateTime @default(now())
+  status    String
+
+  // Relations
+  details   StocktakingDetail[]
+  user      User     @relation("StocktakingCreatedBy", fields: [createdBy], references: [id])
+
+  @@map("stocktaking") 
+}
+
+model StocktakingDetail {
+  id             Int      @id @default(autoincrement())
+  stocktakingId  Int
+  productId      Int
+  actualQuantity Int
+  systemQuantity Int
+  difference     Int
+  locationId     Int
+
+  // Relations
+  stocktaking  Stocktaking       @relation(fields: [stocktakingId], references: [id])
+  product      Product           @relation(fields: [productId], references: [id])
+  location     WarehouseLocation @relation(fields: [locationId], references: [id])
+
+  @@map("stocktakingdetail") 
+}
+
+model TransactionLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  action    String
+  target    String
+  targetId  Int?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  @@map("transactionlog") 
+}
+
+
 

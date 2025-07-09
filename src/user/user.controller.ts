@@ -16,8 +16,9 @@ export class UserController {
     async getUser(@Param('userId', ValidIdPipe) userId: number) {
         return this.userService.findUserById(userId);
     }
+    
     @Post()
-    async createUser(createUserDto: CreateUserDto) {
+    async createUser(@Body()createUserDto: CreateUserDto) {
         // Here you would typically call a service method to create a user
         return this.userService.createUser(createUserDto);
     }

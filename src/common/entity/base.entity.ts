@@ -2,10 +2,10 @@ import { UpdateDateColumn, CreateDateColumn } from "typeorm";
 
 export class BaseEntity {
 
-  @CreateDateColumn({name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({name: 'createdAt', type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({name: 'updated_at', type: 'timestamp' })
+  @UpdateDateColumn({name: 'updatedAt', type: 'timestamp' })
   updatedAt: Date;
 
 }

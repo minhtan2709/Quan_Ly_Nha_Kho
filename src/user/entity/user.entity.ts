@@ -1,7 +1,7 @@
 // src/users/user.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { BaseEntity } from '../../common/entity/base.entity';
-@Entity()
+@Entity({ name: 'user' }) // Đúng với tên bảng đang có trong DB (chữ thường)
 export class User extends BaseEntity{
   @PrimaryGeneratedColumn()
   id: number;
@@ -9,14 +9,14 @@ export class User extends BaseEntity{
   @Column({type:'varchar', length:20 ,unique: true })
   username: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: false })
+  @Column({ type: 'varchar', length: 8, nullable: false })
   password: string; // Mật khẩu đã mã hóa
 
   @Column({ type:'varchar',nullable: false, unique: true })
   email: string;
 
   @Column()
-  role: string; // Ví dụ: 'admin', 'manager', 'staff'
+  role: string; // Ví dụ: 'admin', 'viewer', 'staff'
 
   @Column({ default: 'active' })
   status: string; // Trạng thái tài khoản

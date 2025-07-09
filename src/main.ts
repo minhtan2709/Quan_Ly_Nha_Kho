@@ -11,6 +11,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useLogger(['error', 'warn', 'log', 'debug', 'verbose']);
   app.useGlobalFilters(new AllExceptionFilter());
-  await app.listen(process.env.PORT ?? 3000);
+  app.enableCors({
+    origin: '*', // Hoặc truyền domain cụ thể: ['http://localhost:3001']
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

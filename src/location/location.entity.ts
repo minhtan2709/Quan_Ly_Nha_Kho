@@ -1,25 +1,22 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class Product {
+export class WarehouseLocation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  code: string;
-
   @Column()
   name: string;
+
+  @Column({ unique: true })
+  code: string;
 
   @Column({ nullable: true })
   description: string;
 
   @Column()
-  unit: string;
-
-  @Column({ default: 0 })
-  quantity: number;
+  type: string;
 
   @Column({ nullable: true })
-  barcode: string;
+  parentId: number;
 }

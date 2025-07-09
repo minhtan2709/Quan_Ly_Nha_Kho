@@ -37,19 +37,18 @@ export class AuthService {
     }
 }
 
-
-
     async validateUser(email: string, password: string) {
         const user = await this.userService.findUserByEmail(email);
-        if(!user) {
+        // console.log('validateUser:', { email, password, user });
+        if (!user) {
             throw new BadRequestException('User does not exist for the given email')
         }
         const isPasswordCorrect = await comparePassword(password, user.salt, user.password);
+        // console.log('isPasswordCorrect:', isPasswordCorrect);
         if (isPasswordCorrect) {
             return user;
         }
         return null;
-        
-    
     }
+
 }
