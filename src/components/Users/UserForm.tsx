@@ -38,7 +38,7 @@ const UserForm: React.FC<UserFormProps> = ({ userId, onSubmit }) => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 800, mx: 'auto', mt: 4 }}>
       <Typography variant="h6" mb={2}>{userId ? 'Edit User' : 'Create User'}</Typography>
       <TextField
         label="Username"

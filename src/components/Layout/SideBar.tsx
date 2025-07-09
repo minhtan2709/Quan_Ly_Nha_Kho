@@ -2,10 +2,9 @@ import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import GroupIcon from '@mui/icons-material/Group';
-
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
-// import các icon...
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 
 const items = [
   { text: 'Inbound', icon: <UploadIcon />, link: '/inbounds' },
@@ -21,6 +20,13 @@ interface SideBarProps {
 }
 
 export default function SideBar({ open, onClose }: SideBarProps) {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
     <Drawer open={open} onClose={onClose}>
       <List sx={{ width: 220 }}>
@@ -33,6 +39,14 @@ export default function SideBar({ open, onClose }: SideBarProps) {
           </ListItem>
         ))}
       </List>
+      <Box sx={{ position: 'absolute', bottom: 0, width: "100%", px: 2, pb: 2 }}>
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleLogout}>
+            <ListItemIcon><LogoutIcon /></ListItemIcon>
+            <ListItemText primary={<Typography fontWeight={500}>Log out</Typography>} />
+          </ListItemButton>
+        </ListItem>
+      </Box>
     </Drawer>
   );
 }

@@ -20,6 +20,7 @@ export default function AuthForm() {
     e.preventDefault();
     try {
       const res = await axios.post('/auth/login', { email, password });
+      // Lưu token vào localStorage
       localStorage.setItem('token', res.data.token || res.data.access_token);
       setSnackbar({
         open: true,

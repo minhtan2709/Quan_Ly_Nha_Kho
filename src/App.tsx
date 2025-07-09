@@ -39,7 +39,7 @@ function App() {
           <Route path="/reports/low-stock" element={<LowStockReport />} />
           <Route path="/users" element={<UserList />} />
           {/* Đường dẫn không hợp lệ sẽ redirect về sản phẩm */}
-          <Route path="*" element={<Navigate to="/products" />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       </MainLayout>
   );
