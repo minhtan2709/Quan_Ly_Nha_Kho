@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.createProduct = exports.getProductById = exports.getProducts = void 0;
 const client_1 = require("@prisma/client");
+const node_crypto_1 = require("node:crypto");
 const prisma = new client_1.PrismaClient();
 function normalizePrice(p) {
     return (p === null || p === void 0 ? void 0 : p.price) && typeof p.price === "object" && "toNumber" in p.price
@@ -59,6 +60,8 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!name)
             return res.status(400).json({ message: "name is required" });
         const data = {
+            // nếu client không gửi, tự tạo UUID
+            productId: productId ? String(productId) : (0, node_crypto_1.randomUUID)(), // 👈 đảm bảo luôn có id
             name: String(name),
             stockQuantity: stockQuantity != null ? Number(stockQuantity) : 0,
             rating: rating != null ? Number(rating) : null,
@@ -66,10 +69,9 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         };
         if (price != null)
             data.price = new client_1.Prisma.Decimal(String(price));
-        if (productId)
-            data.productId = String(productId);
         const created = yield prisma.products.create({ data });
-        res.status(201).json(normalizePrice(created));
+        res.status(201).json((created === null || created === void 0 ? void 0 : created.price) && typeof created.price === "object" && "toNumber" in created.price
+            ? Object.assign(Object.assign({}, created), { price: created.price.toNumber() }) : created);
     }
     catch (e) {
         console.error(e);

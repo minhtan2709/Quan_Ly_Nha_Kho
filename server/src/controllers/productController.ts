@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { randomUUID } from "node:crypto";
 
 const prisma = new PrismaClient();
 
@@ -51,16 +52,21 @@ export const createProduct = async (req: Request, res: Response) => {
     if (!name) return res.status(400).json({ message: "name is required" });
 
     const data: any = {
+      // nếu client không gửi, tự tạo UUID
+      productId: productId ? String(productId) : randomUUID(),   // 👈 đảm bảo luôn có id
       name: String(name),
       stockQuantity: stockQuantity != null ? Number(stockQuantity) : 0,
       rating: rating != null ? Number(rating) : null,
       imageUrl: imageUrl ? String(imageUrl) : null,
     };
     if (price != null) data.price = new Prisma.Decimal(String(price));
-    if (productId) data.productId = String(productId);
 
     const created = await prisma.products.create({ data });
-    res.status(201).json(normalizePrice(created));
+    res.status(201).json(
+      created?.price && typeof (created as any).price === "object" && "toNumber" in (created as any).price
+        ? { ...created, price: (created as any).price.toNumber() }
+        : created
+    );
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Error creating product" });
