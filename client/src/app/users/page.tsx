@@ -220,7 +220,7 @@ export default function UsersPage() {
           <Lock className="w-5 h-5 mt-0.5" />
           <div>
             <div className="font-semibold">Permission denied</div>
-            <div className="text-sm">Bạn không có quyền truy cập trang này.</div>
+            <div className="text-sm">You do not have permission to access this page.</div>
           </div>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function UsersPage() {
             placeholder="Search users by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            // ⬇️ ngăn autofill lạ khi mở modal
+            
             autoComplete="off"
             name="user-search"
             disabled={anyModalOpen}
